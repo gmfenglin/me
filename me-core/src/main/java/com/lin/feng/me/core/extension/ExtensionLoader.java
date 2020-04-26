@@ -35,7 +35,7 @@ public class ExtensionLoader<T> {
 		}
 	}
 
-	public static final boolean DEBUG = true;
+	public static final boolean DEBUG = false;
 
 	public static void log(Object o, String methodName, String msg) {
 		if (DEBUG) {
