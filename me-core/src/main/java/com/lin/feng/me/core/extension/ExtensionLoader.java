@@ -2,6 +2,7 @@ package com.lin.feng.me.core.extension;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.nio.charset.StandardCharsets;
@@ -100,8 +101,12 @@ public class ExtensionLoader<T> {
 		if (name == null) {// 1. 不能为空
 			runException.notNull("extension name==null");
 		}
+
 		if ("me".equals(name)) {// 2. 获取默认扩展
 			name = this.defaultName;
+		}
+		if (!CAHCE_EXTENSION_CLASSES.containsKey(name)) {
+			runException.notNull("extension cls not find");
 		}
 		String key = name;
 		if (dependMap != null && dependMap.size() > 0) {
@@ -124,8 +129,8 @@ public class ExtensionLoader<T> {
 			synchronized (holder) {
 				instance = holder.get();
 				if (instance == null) {
-					instance = createExtension(name, dependMap);
-					holder.set(instance);
+					createExtension(name, dependMap, holder);
+					instance = holder.get();
 				}
 			}
 		}
@@ -133,7 +138,7 @@ public class ExtensionLoader<T> {
 
 	}
 
-	private T createExtension(String name, Map<String, String> dependMap) {
+	private void createExtension(String name, Map<String, String> dependMap, Holder<Object> holder) {
 
 		Class<?> clsExtension = CAHCE_EXTENSION_CLASSES.get(name);
 		log(this, "createExtension", "starting:" + clsExtension);
@@ -142,14 +147,14 @@ public class ExtensionLoader<T> {
 		}
 		try {
 			T instance = (T) clsExtension.newInstance();
-			instance = inject(instance, name, dependMap);
 			if (instance instanceof AopListener) {
 				instance = (T) new ProxyWarpper(instance).createProxyObject();
 			}
 			if (instance instanceof Lifecycle) {
 				((Lifecycle) instance).initialize();
 			}
-			return inject(instance, name, dependMap);
+			holder.set(instance);
+			inject(instance, name, dependMap);
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new IllegalArgumentException(e);
@@ -183,16 +188,20 @@ public class ExtensionLoader<T> {
 						injectName = tmp;
 					}
 				}
-				if (name.equals(injectName)) {
-					runException.must("extension not support inject in with self");
-				}
 				log(this, "inject", "starting-" + property + "-" + instance);
 				try {
+					ExtensionLoader<?> loader = ExtensionLoader.getExtensionLoader(pt);
 
-					Object object = ExtensionLoader.getExtensionLoader(pt).getExtension(injectName);
-					if (object != null) {
-						method.invoke(instance, object);
+					Field field = CAHCE_EXTENSION_CLASSES.get(name).getDeclaredField(property);
+					try {
+						field.setAccessible(true);
+						if (field.get(instance) == null) {
+							method.invoke(instance, loader.getExtension(injectName));
+						}
+					} finally {
+						field.setAccessible(false);
 					}
+
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

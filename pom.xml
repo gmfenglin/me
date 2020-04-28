@@ -10,5 +10,6 @@
   	<module>me-provider</module>
   	<module>me-register</module>
   	<module>me-monitor</module>
+  	<module>me-demo</module>
   </modules>
 </project>
