@@ -4,6 +4,8 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
+import com.lin.feng.me.core.extension.runException.JobException;
+
 public class ProxyWarpper implements InvocationHandler {
 	private Object target;
 
@@ -15,37 +17,22 @@ public class ProxyWarpper implements InvocationHandler {
 	@Override
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 		Object result = null;
-		try {
-			before(target, method, args);
+		if (target instanceof AopListener) {
+			AopListener listener = (AopListener) target;
+			try {
+				if (!listener.before(target, method, args)) {
+					throw new JobException("Aop listener before return false");
+				}
+				result = listener.after(target, method, args, method.invoke(target, args));
+			} catch (Exception e) {
+				listener.exception(target, method, args, e);
+			}
+
+		} else {
 			result = method.invoke(target, args);
-			after(target, method, args, result);
-		} catch (Exception e) {
-			exception(target, method, args, e);
 		}
 
 		return result;
-	}
-
-	private void exception(Object target, Method method, Object[] args, Exception e) {
-		if (target instanceof AopListener) {
-			AopListener listener = (AopListener) target;
-			listener.exception(target, method, args, e);
-		}
-
-	}
-
-	private void after(Object target, Method method, Object[] args, Object result) {
-		if (target instanceof AopListener) {
-			AopListener listener = (AopListener) target;
-			listener.after(target, method, args, result);
-		}
-	}
-
-	private void before(Object target, Method method, Object[] args) {
-		if (target instanceof AopListener) {
-			AopListener listener = (AopListener) target;
-			listener.before(target, method, args);
-		}
 	}
 
 	public Object createProxyObject() {

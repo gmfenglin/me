@@ -4,9 +4,15 @@ import java.lang.reflect.Method;
 
 public interface AopListener {
 
-	void exception(Object target, Method method, Object[] args, Exception e);
+	default void exception(Object target, Method method, Object[] args, Exception e) {
+		System.err.println(target + "->" + method.getName() + ":" + (e != null ? e.getMessage() : "null"));
+	}
 
-	void after(Object target, Method method, Object[] args, Object result);
+	default Object after(Object target, Method method, Object[] args, Object result) {
+		return result;
+	}
 
-	void before(Object target, Method method, Object[] args);
+	default boolean before(Object target, Method method, Object[] args) {
+		return true;
+	}
 }

@@ -4,13 +4,13 @@ public class CoreRunException implements RunException {
 
 	@Override
 	public void notNull(String msg) {
-		throw new IllegalArgumentException(msg);
+		throw new JobException(msg);
 
 	}
 
 	@Override
 	public void must(String msg) {
-		throw new IllegalArgumentException(msg);
+		throw new JobException(msg);
 
 	}
 

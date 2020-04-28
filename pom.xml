@@ -7,5 +7,8 @@
   <modules>
   	<module>me-core</module>
   	<module>me-common</module>
+  	<module>me-provider</module>
+  	<module>me-register</module>
+  	<module>me-monitor</module>
   </modules>
 </project>

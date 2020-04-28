@@ -31,6 +31,7 @@ public class ExtensionLoader<T> {
 		try {
 			loadResource();
 		} catch (Exception e) {
+			CAHCE_EXTENSION_CLASSES.clear();
 			e.printStackTrace();
 		}
 	}
@@ -75,6 +76,15 @@ public class ExtensionLoader<T> {
 	public T getExtension(String name) {
 		return getExtension(name, null);
 
+	}
+
+	public T getDefaultExtension() {
+		return getExtension("me");
+	}
+
+	public boolean hasExtension(String name) {
+		return CAHCE_EXTENSION_INSTANCES.containsKey(name) ? (CAHCE_EXTENSION_INSTANCES.get(name).get() != null)
+				: false;
 	}
 
 	private Holder<Object> getOrCreateHolder(String name) {
@@ -123,12 +133,6 @@ public class ExtensionLoader<T> {
 
 	}
 
-	private void initExtension(T instance) {
-		if (instance instanceof Lifecycle) {
-			((Lifecycle) instance).initialize();
-		}
-	}
-
 	private T createExtension(String name, Map<String, String> dependMap) {
 
 		Class<?> clsExtension = CAHCE_EXTENSION_CLASSES.get(name);
@@ -139,10 +143,12 @@ public class ExtensionLoader<T> {
 		try {
 			T instance = (T) clsExtension.newInstance();
 			instance = inject(instance, name, dependMap);
-			if(instance instanceof AopListener) {
+			if (instance instanceof AopListener) {
 				instance = (T) new ProxyWarpper(instance).createProxyObject();
 			}
-			initExtension(instance);
+			if (instance instanceof Lifecycle) {
+				((Lifecycle) instance).initialize();
+			}
 			return inject(instance, name, dependMap);
 		} catch (Exception e) {
 			e.printStackTrace();
