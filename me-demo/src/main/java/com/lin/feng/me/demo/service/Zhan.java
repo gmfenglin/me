@@ -3,6 +3,7 @@ package com.lin.feng.me.demo.service;
 import java.lang.reflect.Method;
 
 import com.lin.feng.me.core.extension.aop.AopListener;
+import com.lin.feng.me.core.extension.runException.JobException;
 
 public class Zhan implements SayHello,AopListener {// AOP通过实现AopListener接口方法
 
@@ -21,9 +22,10 @@ public class Zhan implements SayHello,AopListener {// AOP通过实现AopListener
 		return AopListener.super.after(target, method, args, result);
 	}
 
-	public boolean before(Object target, Method method, Object[] args) {
-		System.out.println("zhan 执行方法前");
-		return AopListener.super.before(target, method, args);
+	@Override
+	public void before(Object target, Method method, Object[] args) throws JobException {
+		throw new JobException("par checked fail.");
 	}
+
 
 }

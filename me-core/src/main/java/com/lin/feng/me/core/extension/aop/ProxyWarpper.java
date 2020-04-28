@@ -20,9 +20,7 @@ public class ProxyWarpper implements InvocationHandler {
 		if (target instanceof AopListener) {
 			AopListener listener = (AopListener) target;
 			try {
-				if (!listener.before(target, method, args)) {
-					throw new JobException("Aop listener before return false");
-				}
+				listener.before(target, method, args);
 				result = listener.after(target, method, args, method.invoke(target, args));
 			} catch (Exception e) {
 				listener.exception(target, method, args, e);
