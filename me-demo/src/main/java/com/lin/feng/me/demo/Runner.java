@@ -12,7 +12,9 @@ public class Runner {
 		ExtensionLoader<SayHello> loader = ExtensionLoader.getExtensionLoader(SayHello.class);
 		System.out.println("-------------------调用默认实现，aop实现------------------------------------");
 		String msg = loader.getDefaultExtension().say("fenglin");
+
 		System.out.println(msg);
+		loader.getDefaultExtension().bye();
 		System.out.println("-------------------按名字调用------------------------------------");
 		msg = loader.getExtension("li").say("fenglin");
 		System.out.println(msg);
@@ -22,10 +24,13 @@ public class Runner {
 		System.out.println("---------------------------ioc 依赖传入,key 为属性名，value为服务key----------------------------");
 		Map<String, String> dependMap = new HashMap<>();
 		dependMap.put("zhan", "li");
-		dependMap.put("li", "web");
-		msg = loader.getExtension("web", dependMap).say("fenglin");
+		// dependMap.put("li", "li");
+		msg = loader.replaceDependcy(loader.getExtension("web", dependMap), dependMap).say("fenglin");
 		System.out.println(msg);
-		System.out.println("-------------------------------------------------------");
+		System.out.println("--------------------getOrDefaultExtension-----------------------------------");
+		msg = loader.getOrDefaultExtension("ni hao").say("fenglin");
+		System.out.println(msg);
+		System.out.println("-------------------------- -----------------------------");
 
 	}
 

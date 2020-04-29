@@ -2,8 +2,9 @@ package com.lin.feng.me.core.extension.aop;
 
 import java.lang.reflect.Method;
 
+import com.lin.feng.me.core.extension.Spi;
 import com.lin.feng.me.core.extension.runException.JobException;
-
+@Spi("base")
 public interface AopListener {
 
 	default void exception(Object target, Method method, Object[] args, Exception e) {
@@ -15,6 +16,5 @@ public interface AopListener {
 	}
 
 	default  void before(Object target, Method method, Object[] args) throws JobException{
-		
 	}
 }

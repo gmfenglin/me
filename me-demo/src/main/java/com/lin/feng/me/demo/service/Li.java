@@ -8,4 +8,10 @@ public class Li implements SayHello {
 		return "li:hello, " + msg;
 	}
 
+	@Override
+	public void bye() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

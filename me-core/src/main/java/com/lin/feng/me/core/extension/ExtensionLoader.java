@@ -16,8 +16,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
 import com.lin.feng.me.core.extension.aop.AopListener;
+import com.lin.feng.me.core.extension.aop.EnableAop;
 import com.lin.feng.me.core.extension.aop.ProxyWarpper;
 import com.lin.feng.me.core.extension.runException.CoreRunException;
+import com.lin.feng.me.core.extension.runException.JobException;
 import com.lin.feng.me.core.extension.runException.RunException;
 
 public class ExtensionLoader<T> {
@@ -88,6 +90,35 @@ public class ExtensionLoader<T> {
 				: false;
 	}
 
+	public T getOrDefaultExtension(String name) {
+		return CAHCE_EXTENSION_CLASSES.containsKey(name) ? getExtension(name) : getDefaultExtension();
+	}
+
+	public T replaceDependcy(T t, Map<String, String> dependMap) {
+		if (dependMap != null && dependMap.size() > 0) {
+			synchronized (t) {
+				Class<?> cls = t.getClass();
+				dependMap.forEach((k, v) -> {
+					try {
+						Field field = cls.getDeclaredField(k);
+						try {
+							field.setAccessible(true);
+							if (field.get(t) != getExtension(v)) {
+								field.set(t, getExtension(v));
+							}
+						} finally {
+							field.setAccessible(false);
+						}
+					} catch (Exception e) {
+						throw new JobException(e.getMessage());
+					}
+				});
+			}
+
+		}
+		return t;
+	}
+
 	private Holder<Object> getOrCreateHolder(String name) {
 		Holder<Object> holder = CAHCE_EXTENSION_INSTANCES.get(name);
 		if (holder == null) {
@@ -147,14 +178,14 @@ public class ExtensionLoader<T> {
 		}
 		try {
 			T instance = (T) clsExtension.newInstance();
-			if (instance instanceof AopListener) {
+			if (clsExtension.isAnnotationPresent(EnableAop.class)) {
 				instance = (T) new ProxyWarpper(instance).createProxyObject();
-			}
-			if (instance instanceof Lifecycle) {
-				((Lifecycle) instance).initialize();
 			}
 			holder.set(instance);
 			inject(instance, name, dependMap);
+			if (instance instanceof Lifecycle) {
+				((Lifecycle) instance).initialize();
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new IllegalArgumentException(e);
@@ -195,8 +226,9 @@ public class ExtensionLoader<T> {
 					Field field = CAHCE_EXTENSION_CLASSES.get(name).getDeclaredField(property);
 					try {
 						field.setAccessible(true);
-						if (field.get(instance) == null) {
-							method.invoke(instance, loader.getExtension(injectName));
+						Object dependy = loader.getExtension(injectName);
+						if (field.get(instance) != dependy) {
+							method.invoke(instance, dependy);
 						}
 					} finally {
 						field.setAccessible(false);

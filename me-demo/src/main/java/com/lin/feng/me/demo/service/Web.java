@@ -30,4 +30,10 @@ public class Web implements SayHello {
 		return "web: " + zhan.say(msg) + " and " + li.say(msg);
 	}
 
+	@Override
+	public void bye() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
