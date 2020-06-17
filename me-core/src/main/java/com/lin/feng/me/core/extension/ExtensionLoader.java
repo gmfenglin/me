@@ -48,7 +48,7 @@ public class ExtensionLoader<T> {
 
 	}
 
-	private static final String[] DIRECTORY = { "META-INF/me/internal/", "META-INF/me/services/" };
+	private static final String[] DIRECTORY = {"META-INF/me/services/" };
 	// 缓存扩展加载器
 	private static ConcurrentHashMap<Class<?>, ExtensionLoader<?>> CAHCE_EXTENSION_LOADERS = new ConcurrentHashMap<Class<?>, ExtensionLoader<?>>();
 	// 缓存扩展实例

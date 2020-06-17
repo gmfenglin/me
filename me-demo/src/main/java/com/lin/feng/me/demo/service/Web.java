@@ -1,7 +1,8 @@
 package com.lin.feng.me.demo.service;
 
 import com.lin.feng.me.core.extension.EnableInject;
-
+import com.lin.feng.me.service.MeService;
+@MeService(SayHello.class)
 public class Web implements SayHello {
 	private SayHello zhan;
 	private SayHello li;

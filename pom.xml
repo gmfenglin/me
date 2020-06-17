@@ -6,10 +6,7 @@
   <packaging>pom</packaging>
   <modules>
   	<module>me-core</module>
-  	<module>me-common</module>
-  	<module>me-provider</module>
-  	<module>me-register</module>
-  	<module>me-monitor</module>
   	<module>me-demo</module>
+  	<module>me-service</module>
   </modules>
 </project>

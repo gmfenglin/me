@@ -4,7 +4,8 @@ import java.lang.reflect.Method;
 
 import com.lin.feng.me.core.extension.aop.AopListener;
 import com.lin.feng.me.core.extension.runException.JobException;
-
+import com.lin.feng.me.service.MeService;
+@MeService(value=AopListener.class,name="imp")
 public class AopListenerImp implements AopListener {
 
 	@Override

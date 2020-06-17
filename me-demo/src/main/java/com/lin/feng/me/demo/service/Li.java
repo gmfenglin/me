@@ -1,5 +1,8 @@
 package com.lin.feng.me.demo.service;
 
+import com.lin.feng.me.service.MeService;
+
+@MeService(SayHello.class)
 public class Li implements SayHello {
 
 	@Override
